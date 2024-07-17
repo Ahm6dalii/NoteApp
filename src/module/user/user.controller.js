@@ -1,7 +1,7 @@
 import userModel from "../../../database/modules/user.module.js";
 import bcrypt from "bcrypt";
 import sendEmail from "../../utils/sendEmail.js";
-
+import jwt from 'jsonwebtoken'
 const getAllUser = async (req, res) => {
 
   let allUsers= await userModel.find();
@@ -26,8 +26,11 @@ const signIn = async (req, res) => {
         return res.status(422).json("invalid email or password")
 
     if(foundedUser.isConfirmed==false)
-      return res.status(401).json("you should to sign-up first ")
-                res.status(200).json({message:"welcome"})
+      return res.status(401).json("you should confirm your eamil first ")
+
+    let token =jwt.sign({id:foundedUser._id,role:foundedUser.role},"secret")
+
+                res.status(200).json({message:"welcome",token})
 
     // if(foundedUser){
     //     let match= await bcrypt.compareSync(req.body.password,foundedUser.password)
